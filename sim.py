@@ -38,21 +38,21 @@ class planet:
         self.radius = radius
         self.velocity = velocity
 
-def draw_planets(planets:slice):
-    turtle_planet.clear()
+def draw_planets(planets:slice, turtle:turtle):
+    turtle.clear()
     for planet in planets:
-        turtle_planet.penup()
-        turtle_planet.setposition(planet.position)
-        turtle_planet.write(planet.name)
-        turtle_planet.dot(5)
-        turtle_planet.setposition(planet.position[0], planet.position[1]-(1*planet.radius))
-        turtle_planet.pendown()
-        turtle_planet.circle(planet.radius)
+        turtle.penup()
+        turtle.setposition(planet.position)
+        turtle.write(planet.name)
+        turtle.dot(5)
+        turtle.setposition(planet.position[0], planet.position[1]-(1*planet.radius))
+        turtle.pendown()
+        turtle.circle(planet.radius)
 
-def draw_ship():
-    turtle_spaceship.clear()
-    turtle_spaceship.setposition(spaceship_pos)
-    turtle_spaceship.dot(10)
+def draw_ship(spaceship_pos:tuple, turtle:turtle):
+    turtle.clear()
+    turtle.setposition(spaceship_pos)
+    turtle.dot(10)
 
 def move_planets(planets):
     for planet in planets:
@@ -71,37 +71,47 @@ def move_spaceship(spaceship_pos, spaceship_vel, planets):
     spaceship_pos = (spaceship_pos[0] + spaceship_vel[0], spaceship_pos[1] + spaceship_vel[1])
     return spaceship_pos, spaceship_vel
 
-def draw_orbit(spaceship_pos, spaceship_vel, planets, steps):
-    turtle_orbit.clear()
-    turtle_orbit.setposition(spaceship_pos)
-    turtle_orbit.pendown()
+def draw_orbit(spaceship_pos, spaceship_vel, planets, steps, turtle:turtle):
+    turtle.clear()
+    turtle.setposition(spaceship_pos)
+    turtle.pendown()
     temp_vel = spaceship_vel
     temp_pos = spaceship_pos
     i=0
     while i < steps:
         i+=1
         temp_pos, temp_vel = move_spaceship(temp_pos, temp_vel, planets)
-        turtle_orbit.goto(temp_pos)
-    turtle_orbit.penup()
+        turtle.goto(temp_pos)
+    turtle.penup()
 
-spaceship_pos = (200,0)
-spaceship_vel = (0,-7)
+def create_turtle()-> turtle:
+    new_turtle = turtle.Turtle(visible=False)
+    new_turtle.speed(0)
+    new_turtle.tracer = False
+    return new_turtle
 
-turtle_planet = turtle.Turtle(visible=False)
-turtle_planet.speed(0)
-turtle_orbit = turtle.Turtle(visible=False)
-turtle_orbit.speed(0)
-turtle.tracer(10)
-turtle_spaceship = turtle.Turtle(visible=False)
-turtle_spaceship.speed(0)
-turtle_orbit.tracer = False
-planets.append(planet("one", 0.001, 50, (0,100), (3, 0)))
-planets.append(planet("two", 0.001, 50, (0,0) , (-3, 0)) )
-draw_planets(planets)
+def main():
+    spaceship_pos = (200,0)
+    spaceship_vel = (0,-7)
 
-while True:
-    move_planets(planets)
-    spaceship_pos, spaceship_vel = move_spaceship(spaceship_pos, spaceship_vel, planets)
-    draw_orbit(spaceship_pos, spaceship_vel, planets, 2000)
-    draw_ship()
-    draw_planets(planets)
+    turtle.tracer(10)
+
+    turtle_planet = create_turtle()
+
+    turtle_orbit = create_turtle()
+
+    turtle_spaceship = create_turtle()
+
+    planets.append(planet("one", 0.001, 50, (0,100), (3, 0)))
+    planets.append(planet("two", 0.001, 50, (0,0) , (-3, 0)) )
+
+    while True:
+        move_planets(planets)
+        spaceship_pos, spaceship_vel = move_spaceship(spaceship_pos, spaceship_vel, planets)
+        draw_orbit(spaceship_pos, spaceship_vel, planets, 2000, turtle_orbit)
+        draw_ship(spaceship_pos, turtle_spaceship)
+        draw_planets(planets, turtle_planet)
+        print(vector(spaceship_vel).magnitude())
+
+if __name__ == "__main__":
+    main()
